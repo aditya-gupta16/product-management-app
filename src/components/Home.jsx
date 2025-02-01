@@ -8,9 +8,11 @@ const Home = () => {
   const [productName, setProductName] = useState('');  // (Checking, product name ko track)
   const [price, setPrice] = useState('');  // (Checking, Price input ko track)
   const navigate = useNavigate();
+  const [showTooltipName, setShowTooltipName] = useState(false);
+  const [showTooltipPrice, setShowTooltipPrice] = useState(false);
 
   useEffect(() => {
-    // We are Checking that user is Logged in, otherwise redirect to login 
+    //( We are Checking that user is Logged in, otherwise redirect to login )
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
@@ -27,7 +29,7 @@ const Home = () => {
   };
 
   const addProduct = () => {
-    // Add product to local array if product is not duplicate
+    // (Add product to local array if product is not duplicate)
     const newProduct = { name: productName, price: price };
     const productExists = products.some(
       (product) => product.name.toLowerCase() === productName.toLowerCase()
@@ -36,7 +38,7 @@ const Home = () => {
       const updatedProducts = [...products, newProduct];
       setProducts(updatedProducts);
       localStorage.setItem('products', JSON.stringify(updatedProducts)); // (Save to localStorage)
-      // Clear input fields after adding the product
+      // (Clear input fields after adding the product)
       setProductName('');
       setPrice('');
     }
@@ -80,30 +82,54 @@ const Home = () => {
           value={search}
           onChange={handleSearch}
           className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out"
+          
         />
+        
       </div>
   
       {/* Add Product Form */}
       <div className="flex flex-wrap gap-4 mb-4">
-        <input
-          type="text"
-          placeholder="Product Name"
-          value={productName}
-          onChange={(e) => setProductName(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && addProduct()}
-          className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out"
-        />
-        <input
-          type="number"
-          placeholder="Price"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && addProduct()}
-          className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out"
-        />
+         
+            <div className="relative mt-3">
+            <input
+              type="text"
+              placeholder="Product Name"
+              value={productName}
+              onChange={(e) => {
+                setProductName(e.target.value);
+                setShowTooltipName(e.target.value === ''); // Show tooltip when empty
+              }}
+              onKeyDown={(e) => e.key === "Enter" && addProduct()}
+              className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out"
+            />
+            {showTooltipName && (
+              <span className="absolute text-red-500 text-xs -top-6 left-2">Product Name cannot be empty</span>
+            )}
+          </div>
+
+          <div className="relative mt-3">
+            <input
+              type="number"
+              placeholder="Price"
+              value={price}
+              onChange={(e) => {
+                setPrice(e.target.value);
+                setShowTooltipPrice(e.target.value === ''); // (Show tooltip when empty)
+              }}
+              onKeyDown={(e) => e.key === "Enter" && addProduct()}
+              className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out"
+            />
+            {showTooltipPrice && (
+              <span className="absolute text-red-500 text-xs -top-6 left-2">Price cannot be empty</span>
+            )}
+          </div>
+         
         <button
           onClick={addProduct}
-          className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transform transition duration-300 ease-in-out"
+          disabled={!productName || !price}
+          className={`${
+            !productName || !price ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-700' }
+             text-white px-4 py-2 mt-3 rounded-lg hover:bg-green-600 transform transition duration-300 ease-in-out`} 
         >
           Add
         </button>
